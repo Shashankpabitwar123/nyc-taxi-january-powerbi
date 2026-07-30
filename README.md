@@ -38,6 +38,21 @@ The PowerPoint link is hosted in SharePoint and may require an ASU/Microsoft
 account. The PDF is the portable artifact for viewers who cannot access the
 Power BI service.
 
+## Screenshots
+
+These screenshots provide a quick visual walkthrough of the completed work:
+
+| View | Screenshot |
+|---|---|
+| January Overview | [Open screenshot](screenshots/01-january-overview.png) |
+| Zones & Operations | [Open screenshot](screenshots/02-zones-and-operations.png) |
+| Data Quality & Methodology | [Open screenshot](screenshots/03-data-quality-methodology.png) |
+| Semantic Model | [Open screenshot](screenshots/04-semantic-model.png) |
+| Power Query Pipeline | [Open screenshot](screenshots/05-power-query-pipeline.png) |
+
+The screenshots are presentation evidence only. The raw Parquet/CSV files and
+storage credentials are intentionally not included in this repository.
+
 ## Data sources
 
 The report uses the following source inputs configured in Power Query:
@@ -173,4 +188,3 @@ and transparent documentation are the safe default.
 - Star-schema semantic modeling
 - Azure Blob Storage source connection
 - PowerPoint and PDF export
-
