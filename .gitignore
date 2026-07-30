@@ -1,0 +1,16 @@
+# Power BI and local analysis files
+*.pbix
+*.pbit
+*.bak
+*.tmp
+
+# Large/raw source data - keep credentials and source extracts out of Git
+*.parquet
+*.csv
+*.json
+data/
+
+# OS/editor files
+.DS_Store
+.vscode/
+
