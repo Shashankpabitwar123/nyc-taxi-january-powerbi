@@ -8,7 +8,7 @@ The aim is to help someone reviewing taxi operations understand the activity beh
 
 **[Open the three-page report PDF](artifacts/NYC%20Taxi%20Raw%20Test.pdf)** — available without a Power BI account.
 
-## The result in plain language
+## Key findings
 
 - **3.25 million trips were included in the main analysis** — about 94 out of every 100 January records.
 - **224,106 records were excluded from the main calculations**, but kept visible in the quality summary so the totals can be checked.
