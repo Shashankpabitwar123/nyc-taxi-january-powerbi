@@ -1,190 +1,66 @@
-# NYC Taxi Raw Model - January 2025
+# NYC Taxi Operations — January 2025
 
-An end-to-end Power BI data-quality and operations analysis of NYC Yellow Taxi
-trip records for **January 2025**. The project starts with raw monthly trip
-data, builds a small star-schema model, applies an explicit January boundary
-filter, and presents the results in a three-page report.
+**Explore where and when New York's yellow taxis were busy, and how much passengers spent.**
 
-> **Scope note:** This is intentionally a January-only implementation. The
-> future plan is to extend the same validated pattern to the remaining 2025
-> months when capacity and time allow. No later-month results are claimed here.
+I used **3.48 million trip records** from the NYC Taxi and Limousine Commission (TLC) to build a three-page Power BI report for **January 2025**. Each record describes one trip, including its time, pickup and drop-off locations, distance, fare and payment details.
 
-## Why this project exists
+The aim is to help someone reviewing taxi operations understand the activity behind the totals: busy times, popular locations and spending. First, I separated the records included in the analysis from those excluded by the project's data-quality classification.
 
-Raw transportation data is useful only after it can be trusted. This project
-was built to demonstrate that process clearly:
+**[Open the three-page report PDF](artifacts/NYC%20Taxi%20Raw%20Test.pdf)** — available without a Power BI account.
 
-1. Start with official raw trip records rather than a pre-aggregated dataset.
-2. Separate valid and excluded rows and reconcile the counts back to the raw total.
-3. Add reusable dimensions for date, pickup zone, drop-off zone, payment type,
-   and rate code.
-4. Produce an executive-friendly report that explains both the findings and
-   the data-quality decisions behind them.
+## The result in plain language
 
-The result is a portfolio project showing practical Power Query, data modeling,
-DAX, validation, and dashboard-design skills.
+- **3.25 million trips were included in the main analysis** — about 94 out of every 100 January records.
+- **224,106 records were excluded from the main calculations**, but kept visible in the quality summary so the totals can be checked.
+- Included trips recorded **about $88 million in passenger spending** and an **average fare of $18.21**.
+- The location charts highlight busy areas, including **Midtown Center** and the **Upper East Side**; the time charts show how activity changes by hour and date.
 
-## Deliverables
+The spending figure describes recorded passenger payments, not taxi-company profit. All findings cover **January 2025 only**.
 
-- [Power BI report PDF](artifacts/NYC%20Taxi%20Raw%20Test.pdf)
-- [PowerPoint presentation (SharePoint link)](https://arizonastateu-my.sharepoint.com/:p:/g/personal/spabitwa_sundevils_asu_edu/IQAmjewK6ftXRoBg1DYv-YpfARJt2VfS_PyPVFOjSAb091w?e=DOMgNl)
-- [Data sources and transformation notes](docs/data-sources-and-pipeline.md)
-- [Model and DAX documentation](docs/model-and-measures.md)
-- [Report page guide and findings](docs/report-guide.md)
-- [Data-quality methodology](docs/data-quality-methodology.md)
-- [Portfolio-ready project summary](docs/portfolio-summary.md)
+[![January overview: trip counts, passenger spending and activity by hour and date](screenshots/01-january-overview.png)](artifacts/NYC%20Taxi%20Raw%20Test.pdf)
 
-The PowerPoint link is hosted in SharePoint and may require an ASU/Microsoft
-account. The PDF is the portable artifact for viewers who cannot access the
-Power BI service.
+## Follow the story through the report
 
-## Screenshots
-
-These screenshots provide a quick visual walkthrough of the completed work:
-
-| View | Screenshot |
+| Page | What it helps you understand |
 |---|---|
-| January Overview | [Open screenshot](screenshots/01-january-overview.png) |
-| Zones & Operations | [Open screenshot](screenshots/02-zones-and-operations.png) |
-| Data Quality & Methodology | [Open screenshot](screenshots/03-data-quality-methodology.png) |
-| Semantic Model | [Open screenshot](screenshots/04-semantic-model.png) |
-| Power Query Pipeline | [Open screenshot](screenshots/05-power-query-pipeline.png) |
+| **1. January Overview** | How many trips were recorded, how much passengers spent, and when trips happened |
+| **2. Zones & Operations** | Which pickup and drop-off areas were busiest, and how people paid |
+| **3. Data Quality & Methodology** | Which records were included, which were excluded, and whether the counts add up |
 
-The screenshots are presentation evidence only. The raw Parquet/CSV files and
-storage credentials are intentionally not included in this repository.
+For example, an operations reviewer can start with the hourly pattern, look at the busy pickup areas, and then check which records were included. These views describe observed trips; they do not establish how many taxis should be assigned to a location.
 
-## Data sources
+## What I did
 
-The report uses the following source inputs configured in Power Query:
+1. **Brought in the source data.** Loaded the January trip file and a lookup that translates location numbers into place names.
+2. **Organized it for analysis.** Connected trips to dates, pickup and drop-off areas, payment types and fare categories.
+3. **Made the calculations consistent.** Used the included-trip population for spending, fares and operational comparisons, while keeping excluded records visible in the audit.
+4. **Built the report.** Created the three pages in Power BI and documented the calculations and scope.
 
-- Official NYC Taxi and Limousine Commission (TLC) Yellow Taxi monthly trip
-  data: `yellow_tripdata_2025-01.parquet`.
-- Official TLC taxi-zone lookup: `taxi_zone_lookup.csv`.
-- Azure Blob Storage account/container used by the project: the
-  `nyctaxisp2025` Blob account and `taxi-raw-2025` container.
+The technical tools were **Power Query** for loading and preparing data, **DAX** for reusable calculations, and **Power BI** for the model and report. The source files were loaded from **Azure Blob Storage**. [Read the model and measure definitions](docs/model-and-measures.md).
 
-The source data is public, but the raw files are intentionally not committed
-to this repository because they are large and are not needed to review the
-analysis. No storage keys, tokens, or private credentials belong in GitHub.
+## How I checked the totals
 
-Official source reference: [NYC TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
-
-## What was built
-
-### Data preparation and validation
-
-- Loaded the monthly Parquet trip data and zone lookup through Power Query.
-- Built a January fact table named `Fact Trips - January Test`.
-- Added a `Trip Validity` classification so valid and excluded rows can be
-  measured separately.
-- Applied the report-wide filter `Dim Date[Month Number] < 2` to keep the report
-  within January and exclude the single February 1 boundary row.
-- Kept blank rate codes visible as a data-quality signal instead of silently
-  deleting them.
-- Reconciled valid plus excluded rows to the raw row count on the methodology
-  page.
-
-### Semantic model
-
-The model uses a single-direction star-schema pattern:
-
-```text
-Dim Date          ─┐
-Dim Pickup Zone    ├──> Fact Trips - January Test
-Dim Dropoff Zone   ┤
-Dim Payment Type   ┤
-Dim Rate Code      ┘
-
-KPI Measures (measure table; no relationship required)
-```
-
-The dimension side is `1` and the fact side is `many` for each active
-relationship. This keeps filtering predictable and avoids bidirectional
-ambiguity.
-
-## Report pages
-
-### 1. January Overview
-
-Executive KPIs and time patterns:
-
-- Raw Trip Rows
-- Valid Trips
-- Excluded Trips
-- Trip Validity Rate
-- Gross Passenger Spend
-- Average Fare per Trip
-- Valid Trips by Pickup Hour
-- Valid Trips by Date
-
-### 2. Zones & Operations
-
-Operational breakdowns using the validated trip measure:
-
-- Top 10 Pickup Zones by Valid Trips
-- Top 10 Drop-off Zones by Valid Trips
-- Valid Trips by Payment Type
-- Valid Trips by Rate Code
-
-The `(Blank)` rate-code category remains visible because it helps reviewers
-understand the source-data quality rather than hiding missing classifications.
-
-### 3. Data Quality & Methodology
-
-The audit page makes the result defensible:
-
-- Valid versus excluded trip-row donut
-- Exact reconciliation table
-- Methodology notes covering measures, relationships, scope, sources,
-  boundary-row treatment, and validity definitions
-
-## January results
-
-The report's exact reconciliation is:
-
-| Metric | January result |
+| January records | Exact count |
 |---|---:|
-| Raw trip rows | 3,475,204 |
-| Valid trips | 3,251,098 |
-| Excluded trips | 224,106 |
-| Validity rate | 93.55% |
-| Excluded share | 6.45% |
-| Gross passenger spend | approximately $88M |
-| Average fare per trip | $18.21 |
+| Included in the main analysis, labeled “Valid” | 3,251,098 |
+| Excluded from the main analysis | 224,106 |
+| Total January records | **3,475,204** |
 
-The report cards intentionally abbreviate large values for readability (for
-example, `3M` and `224K`); the exact values are shown on the reconciliation
-page.
+**3,251,098 + 224,106 = 3,475,204.** The included share is **93.55%**; the excluded share is **6.45%**. “Valid” is the project's classification, not a guarantee that every field is error-free.
 
-## Future roadmap
+A February 1 boundary record is kept outside the January report. Missing fare-category labels remain visible so a reader can see where the source has gaps. [Read the data-quality notes](docs/data-quality-methodology.md).
 
-The next logical phase is to extend this validated January model to the other
-2025 months:
+## Explore the work
 
-1. Add the next monthly Parquet file through the same controlled Power Query
-   pattern.
-2. Re-run row-count, validity, date-boundary, and relationship checks.
-3. Add a month field and a year-to-date comparison layer.
-4. Reuse the existing dimensions and measures where their definitions remain
-   valid.
-5. Add month-over-month trends only after each month passes validation.
+- [Three-page report PDF](artifacts/NYC%20Taxi%20Raw%20Test.pdf)
+- [Zones and operations preview](screenshots/02-zones-and-operations.png) · [Data-quality preview](screenshots/03-data-quality-methodology.png)
+- [Data sources and preparation steps](docs/data-sources-and-pipeline.md)
+- [Model and calculations](docs/model-and-measures.md) · [Model diagram](screenshots/04-semantic-model.png) · [Power Query preview](screenshots/05-power-query-pipeline.png)
+- [Report reading guide](docs/report-guide.md) · [Project summary](docs/portfolio-summary.md)
+- [PowerPoint presentation](https://arizonastateu-my.sharepoint.com/:p:/g/personal/spabitwa_sundevils_asu_edu/IQAmjewK6ftXRoBg1DYv-YpfARJt2VfS_PyPVFOjSAb091w?e=DOMgNl) — may require an ASU/Microsoft account; use the PDF above for public review.
 
-This roadmap is planned work, not part of the current January results.
+**Source:** [Official NYC TLC trip records](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page), using `yellow_tripdata_2025-01.parquet` and `taxi_zone_lookup.csv`.
 
-## Reproducibility and sharing
+This repository contains the report PDF, screenshots and documentation. It does not include a public interactive Power BI link, the editable `.pbix` file or the raw trip files. The findings describe the included yellow-taxi records, not all travel in New York. Extending the report to later months is future work.
 
-The Power BI service report is the interactive source. The PDF and PowerPoint
-are presentation artifacts. A normal PowerPoint export is static; a secure
-Power BI embed requires viewer permissions. A public interactive link would
-require the tenant administrator to enable Power BI **Publish to web**, which
-also exposes the published model data. For a portfolio, the static artifacts
-and transparent documentation are the safe default.
-
-## Technologies
-
-- Power BI Service
-- Power Query (M)
-- DAX measures and calculated tables
-- Star-schema semantic modeling
-- Azure Blob Storage source connection
-- PowerPoint and PDF export
+Built by **Shashank Pabitwar** · Power BI, Power Query and DAX · Historical public data
